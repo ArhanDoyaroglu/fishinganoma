@@ -1,7 +1,7 @@
 {
   "name": "fishinganoma",
   "version": "1.0.0",
-  "description": "Online fishing game with leaderboard",
+  "description": "Fishing Anoma - Online fishing game with leaderboard",
   "main": "index.js",
   "scripts": {
     "dev": "vercel dev",
