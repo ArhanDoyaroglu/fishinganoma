@@ -8,23 +8,10 @@
 	<link rel="stylesheet" href="style.css">
 </head>
 <body>
-	<!-- Name Input Modal -->
-	<div id="nameModal" class="modal">
-		<div class="modal-content">
-			<h2>🎣 Welcome to Fishing Anoma!</h2>
-			<div class="name-input-section">
-				<label for="playerName">Enter your name:</label>
-				<input type="text" id="playerName" placeholder="Your name" maxlength="20">
-				<button id="startGameBtn" class="start-game-btn">🎯 Start Fishing!</button>
-			</div>
-		</div>
-	</div>
-
 	<div class="ui">
 		<div class="stats">
 			<div><span>⭐ Score:</span> <strong id="score">0</strong></div>
 			<div><span>🏆 Top Score:</span> <strong id="topScore">0</strong></div>
-			<div><span>📊 Leaderboard:</span> <button id="showLeaderboardBtn" class="leaderboard-btn">🏅 Top 5</button></div>
 		</div>
 	</div>
 
@@ -37,9 +24,6 @@
 	<div id="resultsModal" class="modal">
 		<div class="modal-content">
 			<h2>🎣 Fishing Results!</h2>
-			<div class="player-info">
-				<span>Player: <strong id="playerNameDisplay">Unknown</strong></span>
-			</div>
 			<div class="fish-summary">
 				<div class="fish-counts" id="fishCounts">
 					<!-- Fish counts will be populated here -->
@@ -50,17 +34,6 @@
 				</div>
 			</div>
 			<button id="tryAgainBtn" class="try-again-btn">🎯 Try Again!</button>
-		</div>
-	</div>
-
-	<!-- Leaderboard Modal -->
-	<div id="leaderboardModal" class="modal">
-		<div class="modal-content">
-			<h2>🏆 Leaderboard - Top 5</h2>
-			<div class="leaderboard-list" id="leaderboardList">
-				<!-- Leaderboard entries will be populated here -->
-			</div>
-			<button id="closeLeaderboardBtn" class="close-btn">✖ Close</button>
 		</div>
 	</div>
 

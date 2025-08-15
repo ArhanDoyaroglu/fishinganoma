@@ -23,11 +23,11 @@ const fishermanImg = new Image();
 fishermanImg.src = "fisherman.png";
 
 // Starting settings
-const START_DEPTH = 2000; // fixed depth
+const START_DEPTH = 1800; // fixed depth
 
 // No upgrade system (fixed depth, score)
 
-// Fish types (4 types) — speeds: White 1x, Blue 1.5x, Red 2x, Golden 3x
+// Fish types (4 types) — speeds: White 1x, Blue 1.5x, Red 2x, Yellow 3x
 const FISH_SPEED_UNIT = 0.50; // 1x base speed (px/frame approx)
 const FISH_TYPES = [
 	{ key: "white", name: "White", color: "#ffffff", value: 5, speedMultiplier: 1.0, rarityDepth: 0.00 },
@@ -52,80 +52,11 @@ function randRange(min, max) {
 }
 
 /**
- * Leaderboard system
- */
-let leaderboard = [];
-
-async function loadLeaderboard() {
-	try {
-		const response = await fetch('/api/leaderboard');
-		if (response.ok) {
-			leaderboard = await response.json();
-		} else {
-			leaderboard = [];
-		}
-	} catch (error) {
-		console.error('Error loading leaderboard:', error);
-		leaderboard = [];
-	}
-}
-
-async function addToLeaderboard(playerName, score) {
-	try {
-		const response = await fetch('/api/leaderboard', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({ name: playerName, score: score })
-		});
-		
-		if (response.ok) {
-			// Reload leaderboard to get updated data
-			await loadLeaderboard();
-		}
-	} catch (error) {
-		console.error('Error adding to leaderboard:', error);
-	}
-}
-
-function updateLeaderboardDisplay() {
-	const leaderboardList = document.getElementById('leaderboardList');
-	leaderboardList.innerHTML = '';
-	
-	if (leaderboard.length === 0) {
-		// Show empty leaderboard message
-		const emptyDiv = document.createElement('div');
-		emptyDiv.className = 'empty-leaderboard';
-		emptyDiv.innerHTML = `
-			<div class="empty-message">
-				<p>🏆 No scores yet!</p>
-				<p>Be the first to set a record!</p>
-			</div>
-		`;
-		leaderboardList.appendChild(emptyDiv);
-		return;
-	}
-	
-	leaderboard.forEach((entry, index) => {
-		const entryDiv = document.createElement('div');
-		entryDiv.className = 'leaderboard-entry';
-		entryDiv.innerHTML = `
-			<div class="rank">${index + 1}</div>
-			<div class="player-name">${entry.name}</div>
-			<div class="score">${entry.score} pts</div>
-		`;
-		leaderboardList.appendChild(entryDiv);
-	});
-}
-
-/**
  * Game state
  */
 const state = {
 	coins: 0,
 	topScore: 0,
-	playerName: "",
 	get maxDepth() {
 		return START_DEPTH;
 	},
@@ -152,62 +83,6 @@ const resultsModal = document.getElementById("resultsModal");
 const modalScore = document.getElementById("modalScore");
 const fishCounts = document.getElementById("fishCounts");
 const tryAgainBtn = document.getElementById("tryAgainBtn");
-const nameModal = document.getElementById("nameModal");
-const playerNameInput = document.getElementById("playerName");
-const startGameBtn = document.getElementById("startGameBtn");
-const showLeaderboardBtn = document.getElementById("showLeaderboardBtn");
-const leaderboardModal = document.getElementById("leaderboardModal");
-const closeLeaderboardBtn = document.getElementById("closeLeaderboardBtn");
-const playerNameDisplay = document.getElementById("playerNameDisplay");
-
-/**
- * Initialize game
- */
-async function initGame() {
-	await loadLeaderboard();
-	
-	// Check if player name is already saved
-	const savedPlayerName = localStorage.getItem('fishingAnomaPlayerName');
-	const savedTopScore = localStorage.getItem('fishingAnomaTopScore');
-	
-	if (savedPlayerName) {
-		// Player has played before, restore their data
-		state.playerName = savedPlayerName;
-		state.topScore = savedTopScore ? parseInt(savedTopScore) : 0;
-		playerNameDisplay.textContent = savedPlayerName;
-		updateUI();
-		resetRun(); // Start game directly
-	} else {
-		// First time player, show name input
-		showNameModal();
-	}
-}
-
-function showNameModal() {
-	nameModal.style.display = 'block';
-	playerNameInput.focus();
-}
-
-function hideNameModal() {
-	nameModal.style.display = 'none';
-}
-
-function startGame() {
-	const name = playerNameInput.value.trim();
-	if (name.length < 2) {
-		alert("Please enter a name (at least 2 characters)");
-		return;
-	}
-	
-	state.playerName = name;
-	playerNameDisplay.textContent = name;
-	
-	// Save player name to localStorage
-	localStorage.setItem('fishingAnomaPlayerName', name);
-	
-	hideNameModal();
-	resetRun();
-}
 
 /**
  * Canvas
@@ -242,7 +117,7 @@ function createFishField() {
 		// Select fish based on depth
 		const candidates = FISH_TYPES.filter(ft => t >= ft.rarityDepth - 0.1);
 		const fishType = candidates[Math.floor(Math.random() * candidates.length)] || FISH_TYPES[0];
-		// Use type speed multiplier: White 1x, Blue 1.5x, Red 2x, Golden 3x
+		// Use type speed multiplier: White 1x, Blue 1.5x, Red 2x, Yellow 3x
 		const valueScaledSpeed = FISH_SPEED_UNIT * fishType.speedMultiplier;
 		state.fish.push({
 			x: randRange(40, CANVAS_WIDTH - 40),
@@ -278,9 +153,6 @@ function resetRun() {
 function updateUI() {
 	elScore.textContent = state.coins.toString();
 	elTopScore.textContent = state.topScore.toString();
-	
-	// Save top score to localStorage
-	localStorage.setItem('fishingAnomaTopScore', state.topScore.toString());
 }
 
 /**
@@ -296,7 +168,6 @@ function showResultsModal() {
 	
 	// Update modal content
 	modalScore.textContent = state.coins.toString();
-	playerNameDisplay.textContent = state.playerName;
 	
 	// Clear previous fish counts
 	fishCounts.innerHTML = '';
@@ -330,56 +201,12 @@ function hideResultsModal() {
 }
 
 /**
- * Show leaderboard modal
- */
-function showLeaderboardModal() {
-	updateLeaderboardDisplay();
-	leaderboardModal.style.display = 'block';
-}
-
-/**
- * Hide leaderboard modal
- */
-function hideLeaderboardModal() {
-	leaderboardModal.style.display = 'none';
-}
-
-/**
  * Try again button event
  */
 tryAgainBtn.addEventListener('click', () => {
 	hideResultsModal();
 	resetRun();
 });
-
-/**
- * Interaction: click -> drop/reel
- */
-canvas.addEventListener("click", () => {
-	if (state.phase === "idle") {
-		state.phase = "dropping";
-	}
-});
-
-canvas.addEventListener("pointerdown", (e) => {
-	if (state.phase !== "rising" && state.phase !== "dropping") return;
-	isPointerDown = true;
-	state.hookTargetX = clamp(e.offsetX, 20, CANVAS_WIDTH - 20);
-	try { canvas.setPointerCapture(e.pointerId); } catch {}
-});
-
-canvas.addEventListener("pointermove", (e) => {
-	if (state.phase !== "rising" && state.phase !== "dropping") return;
-	if (!isPointerDown) return;
-	state.hookTargetX = clamp(e.offsetX, 20, CANVAS_WIDTH - 20);
-});
-
-canvas.addEventListener("pointerup", (e) => {
-	isPointerDown = false;
-	try { canvas.releasePointerCapture(e.pointerId); } catch {}
-});
-
-canvas.addEventListener("pointercancel", () => { isPointerDown = false; });
 
 /**
  * Interaction: click -> drop/reel
@@ -461,9 +288,6 @@ function update(dt) {
 			if (state.coins > state.topScore) {
 				state.topScore = state.coins;
 			}
-			
-			// Add to leaderboard
-			addToLeaderboard(state.playerName, state.coins);
 			
 			// Show results modal
 			showResultsModal();
@@ -668,20 +492,8 @@ function loop(ts) {
 	requestAnimationFrame(loop);
 }
 
-// Event listeners
-startGameBtn.addEventListener('click', startGame);
-showLeaderboardBtn.addEventListener('click', showLeaderboardModal);
-closeLeaderboardBtn.addEventListener('click', hideLeaderboardModal);
-
-// Enter key support for name input
-playerNameInput.addEventListener('keypress', (e) => {
-	if (e.key === 'Enter') {
-		startGame();
-	}
-});
-
-// Initialize game instead of starting immediately
-initGame();
+// Start
+resetRun();
 requestAnimationFrame(loop);
 
 // Load sprites
