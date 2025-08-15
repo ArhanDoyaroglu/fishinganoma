@@ -1,0 +1,2 @@
+# This file ensures the database directory is created
+# SQLite database file will be created automatically when first API call is made

@@ -1,0 +1,21 @@
+{
+  "name": "fishinganoma",
+  "version": "1.0.0",
+  "description": "Online fishing game with leaderboard",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "vercel build",
+    "deploy": "vercel --prod"
+  },
+  "dependencies": {
+    "sqlite3": "^5.1.6",
+    "sqlite": "^5.0.1"
+  },
+  "devDependencies": {
+    "vercel": "^32.5.0"
+  },
+  "keywords": ["fishing", "game", "leaderboard", "vercel"],
+  "author": "Your Name",
+  "license": "MIT"
+}
